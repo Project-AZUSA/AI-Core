@@ -45,11 +45,14 @@ namespace AI_Boilerplate
 
                     foreach (string port in InputPorts)
                     {
-                        Socket client = ctx.Socket(SocketType.SUB);
-                        client.Connect(port);
-                        client.Subscribe("", Encoding.UTF8);
+                        if (port.Trim() != "")
+                        {
+                            Socket client = ctx.Socket(SocketType.SUB);
+                            client.Connect(port);
+                            client.Subscribe("", Encoding.UTF8);
 
-                        connections.Add(client);
+                            connections.Add(client);
+                        }
                     }
 
                     PortChanged = false;
