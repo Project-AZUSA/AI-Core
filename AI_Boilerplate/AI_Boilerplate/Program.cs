@@ -20,7 +20,7 @@ namespace AI_Boilerplate
             foreach (string msg in messages)
             {
 
-                Console.WriteLine(msg);
+                Console.WriteLine("MSG("+msg+")");
 
             }
         }
