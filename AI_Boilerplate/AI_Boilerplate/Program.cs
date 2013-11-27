@@ -13,13 +13,21 @@ namespace AI_Boilerplate
         static int resolution = 1000;
 
         static void Process(List<string> messages)
-        {
+        {          
+
             //handle input signals here
+
+            foreach (string msg in messages)
+            {
+
+                Console.WriteLine(msg);
+
+            }
         }
 
 
         static Thread AZUSAlistener;
-        static string[] InputPorts;
+        static string[] InputPorts = new string[] { };
         static bool PortChanged = false;
         static List<Socket> connections = new List<Socket>();
         static List<string> messages = new List<string>();
@@ -27,6 +35,7 @@ namespace AI_Boilerplate
         static void Main(string[] args)
         {
             AZUSAlistener = new Thread(new ThreadStart(ListenToConsole));
+            AZUSAlistener.Start();
 
             using (Context ctx = new Context())            
             {
@@ -56,7 +65,7 @@ namespace AI_Boilerplate
 
                         messages.Clear();
 
-                        System.Threading.Thread.Sleep(1000);
+                        System.Threading.Thread.Sleep(resolution);
 
                     }
                 }
@@ -67,7 +76,12 @@ namespace AI_Boilerplate
 
         static void ListenToConsole()
         {
+
             Console.WriteLine("RegisterAs(AI)");
+            Console.WriteLine("GetInputPorts()");
+            InputPorts = Console.ReadLine().Split(',');
+            PortChanged = true;
+
 
             //Listen for PortHasChanged
 
