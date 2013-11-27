@@ -67,6 +67,8 @@ namespace AI_Boilerplate
 
         static void ListenToConsole()
         {
+            Console.WriteLine("RegisterAs(AI)");
+
             //Listen for PortHasChanged
 
             while (true)
