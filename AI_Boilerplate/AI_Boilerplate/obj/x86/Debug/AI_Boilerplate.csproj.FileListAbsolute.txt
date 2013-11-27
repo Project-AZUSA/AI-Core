@@ -1,0 +1,7 @@
+C:\Users\ytc\Documents\GitHub\AI-Core\AI_Boilerplate\AI_Boilerplate\bin\Debug\AI_Boilerplate.exe.config
+C:\Users\ytc\Documents\GitHub\AI-Core\AI_Boilerplate\AI_Boilerplate\bin\Debug\AI_Boilerplate.exe
+C:\Users\ytc\Documents\GitHub\AI-Core\AI_Boilerplate\AI_Boilerplate\bin\Debug\AI_Boilerplate.pdb
+C:\Users\ytc\Documents\GitHub\AI-Core\AI_Boilerplate\AI_Boilerplate\bin\Debug\clrzmq.dll
+C:\Users\ytc\Documents\GitHub\AI-Core\AI_Boilerplate\AI_Boilerplate\obj\x86\Debug\AI_Boilerplate.csprojResolveAssemblyReference.cache
+C:\Users\ytc\Documents\GitHub\AI-Core\AI_Boilerplate\AI_Boilerplate\obj\x86\Debug\AI_Boilerplate.exe
+C:\Users\ytc\Documents\GitHub\AI-Core\AI_Boilerplate\AI_Boilerplate\obj\x86\Debug\AI_Boilerplate.pdb
