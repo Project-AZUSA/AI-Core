@@ -12,6 +12,17 @@ namespace AI_Boilerplate
         //set the resolution of the AI
         static int resolution = 1000;
 
+        static bool Initialize()
+        {
+
+            //AI initialization
+            //if success return true, otherwise return false
+
+            return true;
+
+
+        }
+
         static void Process(List<string> messages)
         {          
 
@@ -34,6 +45,12 @@ namespace AI_Boilerplate
 
         static void Main(string[] args)
         {
+            if (!Initialize())
+            {
+                Console.WriteLine("ERR(AI Engine initialization failed.)");
+                return;
+            }
+
             AZUSAlistener = new Thread(new ThreadStart(ListenToConsole));
             AZUSAlistener.Start();
 
