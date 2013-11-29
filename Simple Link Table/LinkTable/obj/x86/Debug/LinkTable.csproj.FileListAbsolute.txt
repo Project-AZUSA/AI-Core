@@ -1,0 +1,7 @@
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Debug\AZUSA LinkTable AI.exe.config
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Debug\AZUSA LinkTable AI.exe
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Debug\AZUSA LinkTable AI.pdb
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Debug\clrzmq.dll
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\obj\x86\Debug\LinkTable.csprojResolveAssemblyReference.cache
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\obj\x86\Debug\AZUSA LinkTable AI.exe
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\obj\x86\Debug\AZUSA LinkTable AI.pdb
