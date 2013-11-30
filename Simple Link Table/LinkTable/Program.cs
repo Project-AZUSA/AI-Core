@@ -131,8 +131,6 @@ namespace LinkTable
 
         //接下來是與 AZUSA 和其他引擎溝通的部分, 一般不用更改
         //============================================================
-
-
         static Thread AZUSAlistener;
         static int AZUSAPid;
         static bool AZUSAAlive = true;
@@ -146,14 +144,14 @@ namespace LinkTable
         {
             if (!Initialize())
             {
-                //Console.WriteLine("ERR(AI Engine initialization failed.)");
+                Console.WriteLine("ERR(AI Engine initialization failed.)");
                 return;
             }
 
             AZUSAlistener = new Thread(new ThreadStart(ListenToConsole));
             AZUSAlistener.Start();
 
-            using (Context ctx = new Context())            
+            using (Context ctx = new Context())
             {
                 while (AZUSAAlive)
                 {
@@ -174,7 +172,7 @@ namespace LinkTable
                     PortChanged = false;
 
                     while (!PortChanged && AZUSAAlive)
-                    {          
+                    {
                         foreach (Socket socket in connections)
                         {
                             messages.Add(socket.Recv(Encoding.UTF8));
@@ -182,17 +180,17 @@ namespace LinkTable
 
                         Process(messages);
 
-                        messages.Clear();  
+                        messages.Clear();
                     }
                 }
-                
+
             }
-            
+
         }
 
         static void ListenToConsole()
         {
-            
+
             Console.WriteLine("RegisterAs(AI)");
             Console.WriteLine("GetInputPorts()");
             InputPorts = Console.ReadLine().Split(',');
@@ -204,7 +202,7 @@ namespace LinkTable
 
             //Listen for PortHasChanged
 
-            while (true)
+            while (AZUSAAlive)
             {
                 try
                 {
@@ -219,10 +217,9 @@ namespace LinkTable
                 catch
                 {
                     AZUSAAlive = false;
+                    Environment.Exit(0);
                     break;
                 }
-
-                
             }
         }
     }
