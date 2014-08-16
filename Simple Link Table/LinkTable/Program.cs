@@ -118,7 +118,8 @@ namespace LinkTable
             {
                 
                 string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
-                string[] spt_OR; 
+                string[] spt_OR;
+                bool trigger = false;
 
                 foreach (Word word in wordList)
                 {
@@ -132,11 +133,11 @@ namespace LinkTable
                         {
                             if (msg.Contains(s))
                             {
-                                Console.WriteLine(word.translated);
+                                trigger = true & trigger;
                             }
                         }
                     }
-
+                    if (trigger) { Console.WriteLine(word.translated); }
                     
                 }
 
