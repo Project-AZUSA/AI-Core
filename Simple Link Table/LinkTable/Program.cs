@@ -129,15 +129,24 @@ namespace LinkTable
                     foreach (string str in spt_AND)
                     {
                         spt_OR = str.Split('/');
+
+                        
                         foreach (string s in spt_OR)
                         {
                             if (msg.Contains(s))
                             {
-                                trigger = true & trigger;
+                                trigger=true;
+                                break;
                             }
                         }
+
+                        if (!trigger)
+                        {
+                            break;
+                        }
+
                     }
-                    if (trigger) { Console.WriteLine(word.translated); }
+                    if (trigger) { Console.WriteLine(word.translated.Replace("~~",msg.Replace(word.pronounced,""))); }
                     
                 }
 
