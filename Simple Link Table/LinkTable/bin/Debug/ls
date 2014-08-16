@@ -1,0 +1,20 @@
+﻿#留意匹配是簡單匹配, 沒有分詞(例如就 no 時, no 和 notepad 會同時觸發)
+
+#關鍵字提取,後面的有可能會覆寫前面的
+yes,RESP=TRUE;$RESP=TRUE;$WAITFORRESP=false
+no,$RESP=FALSE;$WAITFORRESP=false
+one,$RESP=1;$WAITFORRESP=false
+two,$RESP=2;$WAITFORRESP=false
+three,$RESP=3;$WAITFORRESP=false
+four,$RESP=4;$WAITFORRESP=false
+five,$RESP=5;$WAITFORRESP=false
+six,$RESP=6;$WAITFORRESP=false
+
+#動作觸發, 所有匹配成功的都會執行
+nanami,SAY(なんですか|はい|ご用件は)
+
+#以前的條件區塊語法還可以使用的, 可是預設的狀態變量現在變成要自行設定 $STATUS
+#例如
+#$STATUS=HIDDEN{
+#nanami,SCRIPT(SHOW)
+#}

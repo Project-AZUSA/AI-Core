@@ -12,7 +12,6 @@ namespace LinkTable
     {
 
         static List<Word> wordList;
-        static bool suppressRej = false;
 
         struct Word
         {
@@ -31,11 +30,11 @@ namespace LinkTable
 
             string currentPath = Environment.CurrentDirectory;
 
-            //read all the commands from list
+            //載入指令表
             try
             {
 
-                rawList = File.ReadAllLines(currentPath + @"\ls");
+                rawList = File.ReadAllLines(currentPath + @"\ls.txt");
             }
             catch
             {
@@ -46,13 +45,13 @@ namespace LinkTable
 
 
             int numLine = 1;
-            string tmp; //for joining conditions
+            string tmp; //條件式暫存
             Stack<string> currentScope = new Stack<string>();
             foreach (string line in rawList)
             {
                 try
                 {
-                    if (line.Trim() != "" && !line.StartsWith("#")) //not a comment or empty line
+                    if (line.Trim() != "" && !line.StartsWith("#")) //無視備註和空行
                     {
                         if (line.EndsWith("{"))
                         {
@@ -69,7 +68,7 @@ namespace LinkTable
                             if (currentScope.Count != 0)
                             {
                                 if (parsed[1].Contains("?"))
-                                { //if there already exists an condition, append scope using AND
+                                { //組合條件式
                                     tmp = "";
                                     foreach (string cond in currentScope)
                                     {
@@ -114,16 +113,31 @@ namespace LinkTable
         //對消息進行處理
         static void Process(List<string> messages)
         {          
-
+            
             foreach (string msg in messages)
             {
+                
+                string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
+                string[] spt_OR; 
 
                 foreach (Word word in wordList)
                 {
-                    if (msg.Contains(word.pronounced))
+
+                    spt_AND = word.pronounced.Split('+');
+
+                    foreach (string str in spt_AND)
                     {
-                        Console.WriteLine(word.translated);
+                        spt_OR = str.Split('/');
+                        foreach (string s in spt_OR)
+                        {
+                            if (msg.Contains(s))
+                            {
+                                Console.WriteLine(word.translated);
+                            }
+                        }
                     }
+
+                    
                 }
 
             }
