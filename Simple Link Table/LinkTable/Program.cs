@@ -123,7 +123,7 @@ namespace LinkTable
 
                 foreach (Word word in wordList)
                 {
-
+                    trigger = false;
                     spt_AND = word.pronounced.Split('+');
 
                     foreach (string str in spt_AND)
