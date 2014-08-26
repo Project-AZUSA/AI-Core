@@ -26,9 +26,10 @@ namespace LinkTable
 
             string[] rawList;
             string[] parsed;
+            string cmd;
             wordList = new List<Word>();
             wordListC = new List<Word>();
-            
+
 
             string currentPath = Environment.CurrentDirectory;
 
@@ -66,17 +67,18 @@ namespace LinkTable
                         else
                         {
                             parsed = line.Split(',');
+                            cmd = line.Replace(parsed[0] + ",", "");
                             Word word;
                             if (currentScope.Count != 0)
                             {
-                                if (parsed[1].Contains("?"))
+                                if (cmd.Contains("?"))
                                 { //組合條件式
                                     tmp = "";
                                     foreach (string cond in currentScope)
                                     {
                                         tmp = tmp + cond + "&";
                                     }
-                                    word.translated = tmp + parsed[1];
+                                    word.translated = tmp + cmd;
                                 }
                                 else
                                 {
@@ -85,12 +87,12 @@ namespace LinkTable
                                     {
                                         tmp = tmp + cond + "&";
                                     }
-                                    word.translated = tmp.TrimEnd('&') + "?" + parsed[1];
+                                    word.translated = tmp.TrimEnd('&') + "?" + cmd;
                                 }
                             }
                             else
                             {
-                                word.translated = parsed[1];
+                                word.translated = cmd;
                             }
 
                             //tilde handling
@@ -104,7 +106,7 @@ namespace LinkTable
                             {
                                 wordList.Add(word);
                             }
-                            
+
                         }
                     }
                 }
@@ -267,6 +269,7 @@ namespace LinkTable
         static void ListenToConsole()
         {
 
+
             Console.WriteLine("RegisterAs(AI)");
             Console.WriteLine("GetInputPorts()");
             InputPorts = Console.ReadLine().Split(',');
@@ -276,6 +279,7 @@ namespace LinkTable
             AZUSAPid = Convert.ToInt32(Console.ReadLine());
 
             string msg;
+
             //Listen for PortHasChanged
 
             while (AZUSAAlive)
