@@ -12,6 +12,7 @@ namespace LinkTable
     {
 
         static List<Word> wordList;
+        static List<Word> wordListC;
 
         struct Word
         {
@@ -26,7 +27,8 @@ namespace LinkTable
             string[] rawList;
             string[] parsed;
             wordList = new List<Word>();
-            List<string> pronunciations = new List<string>();
+            wordListC = new List<Word>();
+            
 
             string currentPath = Environment.CurrentDirectory;
 
@@ -90,9 +92,19 @@ namespace LinkTable
                             {
                                 word.translated = parsed[1];
                             }
-                            word.pronounced = parsed[0];
-                            wordList.Add(word);
-                            pronunciations.Add(word.pronounced);
+
+                            //tilde handling
+                            word.pronounced = parsed[0].Replace("~", "+~+");
+                            if (word.pronounced.StartsWith("@"))
+                            {
+                                word.pronounced.TrimStart('@');
+                                wordListC.Add(word);
+                            }
+                            else
+                            {
+                                wordList.Add(word);
+                            }
+                            
                         }
                     }
                 }
@@ -112,44 +124,84 @@ namespace LinkTable
 
         //對消息進行處理
         static void Process(List<string> messages)
-        {          
-            
+        {
+
             foreach (string msg in messages)
             {
-                
-                string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
-                string[] spt_OR;
-                bool trigger = false;
 
-                foreach (Word word in wordList)
+                LookUp(msg, wordList);
+            }
+        }
+
+        static void ProcessC(string message)
+        {
+            LookUp(message, wordListC);
+        }
+
+        static void LookUp(string msg, List<Word> dict)
+        {
+
+            string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
+            string[] spt_OR;
+            string[] spt_MSG = msg.Split(' ');
+            int pointer = 0;
+            string tilde = "";
+            bool found = false;
+            bool match = false;
+            bool writeTilde = false;
+
+            foreach (Word word in dict)
+            {
+                match = false;
+
+                spt_AND = word.pronounced.Split('+');
+
+                foreach (string part in spt_AND)
                 {
-                    trigger = false;
-                    spt_AND = word.pronounced.Split('+');
-
-                    foreach (string str in spt_AND)
+                    if (part == "~")
                     {
-                        spt_OR = str.Split('/');
+                        writeTilde = true;
+                        continue;
+                    }
 
-                        
-                        foreach (string s in spt_OR)
+                    spt_OR = part.Split('/');
+
+
+                    if (pointer >= spt_MSG.Length) { match = false; }
+
+                    for (int i = pointer; i < spt_MSG.Length; i++)
+                    {
+                        found = false;
+                        foreach (string tWord in spt_OR)
                         {
-                            if (msg.Contains(s))
+                            if (spt_MSG[i].ToLower().Trim() == tWord.ToLower().Trim())
                             {
-                                trigger=true;
+                                pointer = i + 1;
+                                found = true;
+                                writeTilde = false;
                                 break;
                             }
                         }
+                        if (found) { match = true; break; }
 
-                        if (!trigger)
+                        if (writeTilde)
                         {
-                            break;
+                            tilde += spt_MSG[i] + " ";
+                            pointer = i + 1;
+                        }
+                        else if (match)
+                        {
+                            match = false; break;
                         }
 
+
                     }
-                    if (trigger) { Console.WriteLine(word.translated.Replace("~~",msg.Replace(word.pronounced,""))); }
-                    
+
+                    if (!match) { break; }
+
                 }
 
+                if (match) { Console.WriteLine(word.translated.Trim().Replace("~", tilde)); }
             }
         }
 
@@ -223,7 +275,7 @@ namespace LinkTable
             Console.WriteLine("GetAzusaPid()");
             AZUSAPid = Convert.ToInt32(Console.ReadLine());
 
-
+            string msg;
             //Listen for PortHasChanged
 
             while (AZUSAAlive)
@@ -231,11 +283,16 @@ namespace LinkTable
                 try
                 {
                     System.Diagnostics.Process.GetProcessById(AZUSAPid);
-                    if (Console.ReadLine().Trim() == "PortHasChanged")
+                    msg = Console.ReadLine().Trim();
+                    if (msg == "PortHasChanged")
                     {
                         Console.WriteLine("GetInputPorts()");
                         InputPorts = Console.ReadLine().Split(',');
                         PortChanged = true;
+                    }
+                    else
+                    {
+                        ProcessC(msg);
                     }
                 }
                 catch
