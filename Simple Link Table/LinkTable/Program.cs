@@ -99,7 +99,7 @@ namespace LinkTable
                             word.pronounced = parsed[0].Replace("~", "+~+");
                             if (word.pronounced.StartsWith("@"))
                             {
-                                word.pronounced.TrimStart('@');
+                                word.pronounced=word.pronounced.TrimStart('@');
                                 wordListC.Add(word);
                             }
                             else
@@ -297,6 +297,7 @@ namespace LinkTable
                     else
                     {
                         ProcessC(msg);
+
                     }
                 }
                 catch

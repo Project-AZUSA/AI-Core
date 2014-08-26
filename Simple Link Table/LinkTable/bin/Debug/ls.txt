@@ -1,4 +1,7 @@
-﻿#留意匹配是簡單匹配, 沒有分詞(例如 "no" 會同時觸發 no, now, notepad...)
+﻿@osu!,SAY(MATAOSUDESUKA)
+
+
+#留意匹配是簡單匹配, 沒有分詞(例如 "no" 會同時觸發 no, now, notepad...)
 
 #關鍵字提取,後面的有可能會覆寫前面的
 yes,$RESP=TRUE;MAKERESP()
