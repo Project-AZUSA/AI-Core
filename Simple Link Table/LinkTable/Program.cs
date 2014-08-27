@@ -154,16 +154,28 @@ namespace LinkTable
 
             foreach (Word word in dict)
             {
+                //special case "~" 
+                if (word.pronounced == "+~+")
+                {
+                    Console.WriteLine(word.translated.Trim().Replace("~", msg));
+                }
+                //end 
+
                 match = false;
 
                 spt_AND = word.pronounced.Split('+');
 
                 foreach (string part in spt_AND)
                 {
+                    if (part.Trim() == "")
+                    {
+                        continue;
+                    }
+
                     if (part == "~")
                     {
                         writeTilde = true;
-                        continue;
+                        
                     }
 
                     spt_OR = part.Split('/');
@@ -203,7 +215,7 @@ namespace LinkTable
 
                 }
 
-                if (match) { Console.WriteLine(word.translated.Trim().Replace("~", tilde)); }
+                if (match) { Console.WriteLine(word.translated.Trim().Replace("~", tilde));  }
             }
         }
 
