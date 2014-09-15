@@ -1,51 +1,15 @@
-﻿@osu!,SAY(MATAOSUDESUKA)
+﻿hide,KILL(AzusaL2D)
+show,KILL(AzusaL2D);EXEC({AZUSA}\Engines\AzusaL2D.exe)
 
-
-#留意匹配是簡單匹配, 沒有分詞(例如 "no" 會同時觸發 no, now, notepad...)
-
-#關鍵字提取,後面的有可能會覆寫前面的
 yes,$RESP=TRUE;MAKERESP()
 no,$RESP=FALSE;MAKERESP()
-one,$RESP=1;MAKERESP()
-two,$RESP=2;MAKERESP()
-three,$RESP=3;MAKERESP()
-four,$RESP=4;MAKERESP()
-five,$RESP=5;MAKERESP()
-six,$RESP=6;MAKERESP()
 
-#動作觸發, 所有匹配成功的都會執行
-haru,SAY(なんですか|はい|ご用件は)
+chrome,EXEC("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe")
+Nikko,SAY(こんにちは)
+@[PRC_START] osu!, KILL(AzusaL2D)
+
 time,SAY(今は+{tt}+{%h}+時+{%m}+分です)
 date,SAY(今日は+{%M}+月+{%d}+日+{dddd}+です)
-game,SCRIPT(GUESSANUM)
-I+like/love+you,SAY(嬉しいです)
 
-#以前的條件區塊語法還可以使用的, 可是預設的狀態變量現在變成要自行設定
-#例如
-#$STATUS=HIDDEN{
-#nanami,SCRIPT(SHOW)
-#}
+~,MSG(~)
 
-#中日
-はい,$RESP=TRUE;MAKERESP()
-いいえ,$RESP=FALSE;MAKERESP()
-是,$RESP=TRUE;MAKERESP()
-不是,$RESP=FALSE;MAKERESP()
-一,$RESP=1;MAKERESP()
-二,$RESP=2;MAKERESP()
-三,$RESP=3;MAKERESP()
-四,$RESP=4;MAKERESP()
-五,$RESP=5;MAKERESP()
-六,$RESP=6;MAKERESP()
-
-春,SAY(なんですか|はい|ご用件は)
-今何時,SAY(今は+{tt}+{%h}+時+{%m}+分です)
-何日,SAY(今日は+{%M}+月+{%d}+日+{dddd}+です)
-ゲーム,SCRIPT(GUESSANUM)
-时间,SAY(今は+{tt}+{%h}+時+{%m}+分です)
-時間,SAY(今は+{tt}+{%h}+時+{%m}+分です)
-日期,SAY(今日は+{%M}+月+{%d}+日+{dddd}+です)
-猜数字,SCRIPT(GUESSANUM)
-猜數字,SCRIPT(GUESSANUM)
-我+喜歡/愛+你,SAY(嬉しいです)
-我+喜欢/爱+你,SAY(嬉しいです)

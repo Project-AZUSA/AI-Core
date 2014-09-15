@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Threading;
-using ZMQ;
+using ZeroMQ;
 
 namespace LinkTable
 {
@@ -99,7 +99,7 @@ namespace LinkTable
                             word.pronounced = parsed[0].Replace("~", "+~+");
                             if (word.pronounced.StartsWith("@"))
                             {
-                                word.pronounced=word.pronounced.TrimStart('@');
+                                word.pronounced = word.pronounced.TrimStart('@');
                                 wordListC.Add(word);
                             }
                             else
@@ -175,7 +175,7 @@ namespace LinkTable
                     if (part == "~")
                     {
                         writeTilde = true;
-                        
+
                     }
 
                     spt_OR = part.Split('/');
@@ -215,21 +215,25 @@ namespace LinkTable
 
                 }
 
-                if (match) { Console.WriteLine(word.translated.Trim().Replace("~", tilde));  }
+                if (match) { Console.WriteLine(word.translated.Trim().Replace("~", tilde)); }
             }
         }
 
         //接下來是與 AZUSA 和其他引擎溝通的部分, 一般不用更改
         //============================================================
         static Thread AZUSAlistener;
+        static Thread ZMQ;
         static int AZUSAPid;
         static bool AZUSAAlive = true;
 
         static string[] InputPorts = new string[] { };
-        static bool PortChanged = false;
-        static List<Socket> connections = new List<Socket>();
+        static List<string> CurrentPorts = new List<string>();
+        
+        static ZmqSocket client;
         static List<string> messages = new List<string>();
 
+
+        
         static void Main(string[] args)
         {
             if (!Initialize())
@@ -238,44 +242,62 @@ namespace LinkTable
                 return;
             }
 
+            ZMQ = new Thread(new ThreadStart(ZMQListener));
+            ZMQ.Start();
+
             AZUSAlistener = new Thread(new ThreadStart(ListenToConsole));
             AZUSAlistener.Start();
 
-            using (Context ctx = new Context())
+
+            
+        }
+
+        static void ZMQListener()
+        {
+            using (var ctx = ZmqContext.Create())
             {
                 while (AZUSAAlive)
                 {
-                    connections.Clear();
+                    client = ctx.CreateSocket(SocketType.SUB);
+
+                    while (InputPorts.Count() == 0)
+                    {
+                        Thread.Sleep(160);
+                    }
 
                     foreach (string port in InputPorts)
                     {
                         if (port.Trim() != "")
                         {
-                            Socket client = ctx.Socket(SocketType.SUB);
+                            Console.WriteLine("Connecting to " + port);
                             client.Connect(port);
-                            client.Subscribe("", Encoding.UTF8);
-
-                            connections.Add(client);
+                            Console.WriteLine("Connected to " + port);
                         }
                     }
 
-                    PortChanged = false;
 
-                    while (!PortChanged && AZUSAAlive)
+                    client.Subscribe(Encoding.UTF8.GetBytes(""));
+
+
+                   
+
+                    while (AZUSAAlive)
                     {
-                        foreach (Socket socket in connections)
+                        foreach (string port in InputPorts)
                         {
-                            messages.Add(socket.Recv(Encoding.UTF8));
+                            messages.Add(client.Receive(Encoding.UTF8));
                         }
 
-                        Process(messages);
+                        if (messages.Count != 0)
+                        {
+                            Process(messages);
+                        }
 
                         messages.Clear();
                     }
                 }
 
             }
-
         }
 
         static void ListenToConsole()
@@ -285,7 +307,7 @@ namespace LinkTable
             Console.WriteLine("RegisterAs(AI)");
             Console.WriteLine("GetInputPorts()");
             InputPorts = Console.ReadLine().Split(',');
-            PortChanged = true;
+           
 
             Console.WriteLine("GetAzusaPid()");
             AZUSAPid = Convert.ToInt32(Console.ReadLine());
@@ -302,14 +324,26 @@ namespace LinkTable
                     msg = Console.ReadLine().Trim();
                     if (msg == "PortHasChanged")
                     {
+                        
+
                         Console.WriteLine("GetInputPorts()");
                         InputPorts = Console.ReadLine().Split(',');
-                        PortChanged = true;
+
+                        foreach (string port in InputPorts)
+                        {
+                            if (port.Trim() != "" && !CurrentPorts.Contains(port))
+                            {
+                                Console.WriteLine("Connecting to " + port);
+                                client.Connect(port);
+                                CurrentPorts.Add(port);
+                                Console.WriteLine("Connected to " + port);
+                            }
+                        }
+                        
                     }
                     else
-                    {
+                    {                        
                         ProcessC(msg);
-
                     }
                 }
                 catch
