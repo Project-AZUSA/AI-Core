@@ -42,7 +42,7 @@ namespace LinkTable
             catch
             {
                 Console.WriteLine("ERR(Command list does not exist or is corrupted. [AI])");
-                Console.Out.Flush();
+
                 return false;
             }
 
@@ -96,7 +96,7 @@ namespace LinkTable
                             }
 
                             //tilde handling
-                            word.pronounced = parsed[0].Replace("~", "+~+");
+                            word.pronounced = parsed[0].Replace("~", "+~+").Trim('+');
                             if (word.pronounced.StartsWith("@"))
                             {
                                 word.pronounced = word.pronounced.TrimStart('@');
@@ -113,7 +113,7 @@ namespace LinkTable
                 catch
                 {
                     Console.WriteLine("ERR(Unable to parse line " + numLine.ToString() + " in word list. [AI])");
-                    Console.Out.Flush();
+
                     return false;
                 }
                 numLine++;
@@ -142,7 +142,6 @@ namespace LinkTable
 
         static void LookUp(string msg, List<Word> dict)
         {
-
             string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
             string[] spt_OR;
             string[] spt_MSG = msg.Split(' ');
@@ -150,12 +149,20 @@ namespace LinkTable
             string tilde = "";
             bool found = false;
             bool match = false;
-            bool writeTilde = false;
+            bool writeTilde = false;                     
+            
 
             foreach (Word word in dict)
             {
+                
+                pointer = 0;
+                tilde = "";
+                found = false;
+                match = false;
+                writeTilde = false;
+
                 //special case "~" 
-                if (word.pronounced == "+~+")
+                if (word.pronounced == "~")
                 {
                     Console.WriteLine(word.translated.Trim().Replace("~", msg));
                 }
@@ -215,7 +222,11 @@ namespace LinkTable
 
                 }
 
-                if (match) { Console.WriteLine(word.translated.Trim().Replace("~", tilde)); }
+                if (match)
+                {
+                    Console.WriteLine(word.translated.Replace("~", tilde.Trim()).Trim());
+
+                }
             }
         }
 
@@ -228,12 +239,12 @@ namespace LinkTable
 
         static string[] InputPorts = new string[] { };
         static List<string> CurrentPorts = new List<string>();
-        
+
         static ZmqSocket client;
         static List<string> messages = new List<string>();
 
 
-        
+
         static void Main(string[] args)
         {
             if (!Initialize())
@@ -249,7 +260,7 @@ namespace LinkTable
             AZUSAlistener.Start();
 
 
-            
+
         }
 
         static void ZMQListener()
@@ -279,14 +290,13 @@ namespace LinkTable
                     client.Subscribe(Encoding.UTF8.GetBytes(""));
 
 
-                   
+
 
                     while (AZUSAAlive)
                     {
-                        foreach (string port in InputPorts)
-                        {
-                            messages.Add(client.Receive(Encoding.UTF8));
-                        }
+
+                        messages.Add(client.Receive(Encoding.UTF8));
+
 
                         if (messages.Count != 0)
                         {
@@ -307,7 +317,7 @@ namespace LinkTable
             Console.WriteLine("RegisterAs(AI)");
             Console.WriteLine("GetInputPorts()");
             InputPorts = Console.ReadLine().Split(',');
-           
+
 
             Console.WriteLine("GetAzusaPid()");
             AZUSAPid = Convert.ToInt32(Console.ReadLine());
@@ -324,7 +334,7 @@ namespace LinkTable
                     msg = Console.ReadLine().Trim();
                     if (msg == "PortHasChanged")
                     {
-                        
+
 
                         Console.WriteLine("GetInputPorts()");
                         InputPorts = Console.ReadLine().Split(',');
@@ -339,10 +349,10 @@ namespace LinkTable
                                 Console.WriteLine("Connected to " + port);
                             }
                         }
-                        
+
                     }
                     else
-                    {                        
+                    {
                         ProcessC(msg);
                     }
                 }
