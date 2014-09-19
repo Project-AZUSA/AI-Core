@@ -1,15 +1,18 @@
-﻿hide,KILL(AzusaL2D)
-show,KILL(AzusaL2D);EXEC({AZUSA}\Engines\AzusaL2D.exe)
+﻿hide, KILL(AzusaL2D)
+show, KILL(AzusaL2D);EXEC({AZUSA}\Engines\AzusaL2D.exe)
 
-yes,$RESP=TRUE;MAKERESP()
-no,$RESP=FALSE;MAKERESP()
+bili, EXEC(chrome+"$http://bilibili.com/")
+see something cool, SAY(いいよ)
 
-chrome,EXEC("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe")
-Nikko,SAY(こんにちは)
-@[PRC_START] osu!, KILL(AzusaL2D)
+helper, EXEC({AZUSA}\AzuHelp\AzuHelp.exe)
+ls, EXEC({AZUSA}\Engines\ls.txt)
+set~, ~=PRCPath;MSG(~)
+run~, ~!="~"?EXEC(~)
+顯~示, MSG(~)
+#~, ~
+#~,SCRIPT(~)
 
-time,SAY(今は+{tt}+{%h}+時+{%m}+分です)
-date,SAY(今日は+{%M}+月+{%d}+日+{dddd}+です)
-
-~,MSG(~)
+#時間日期
+time, SAY(今は+{tt}+{%h}+時+{%m}+分です)
+date, SAY(今日は+{%M}+月+{%d}+日+{dddd}+です)
 

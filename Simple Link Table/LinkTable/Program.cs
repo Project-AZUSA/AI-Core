@@ -8,7 +8,7 @@ using ZeroMQ;
 
 namespace LinkTable
 {
-    class Program
+    partial class Program
     {
 
         static List<Word> wordList;
@@ -143,19 +143,19 @@ namespace LinkTable
         static void LookUp(string msg, List<Word> dict)
         {
             string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
-            string[] spt_OR;
-            string[] spt_MSG = msg.Split(' ');
-            int pointer = 0;
+            string[] spt_OR; 
+            string remaining_msg="";
+
             string tilde = "";
+            Queue<string> tildeVals = new Queue<string>();
             bool found = false;
             bool match = false;
-            bool writeTilde = false;                     
-            
+            bool writeTilde = false;
+
 
             foreach (Word word in dict)
             {
-                
-                pointer = 0;
+                remaining_msg = msg.Trim();                
                 tilde = "";
                 found = false;
                 match = false;
@@ -170,7 +170,7 @@ namespace LinkTable
 
                 match = false;
 
-                spt_AND = word.pronounced.Split('+');
+                spt_AND = word.pronounced.Split('+', ' ');
 
                 foreach (string part in spt_AND)
                 {
@@ -178,53 +178,66 @@ namespace LinkTable
                     {
                         continue;
                     }
-
                     if (part == "~")
                     {
+                        tilde = remaining_msg;
                         writeTilde = true;
-
+                        continue;
                     }
 
                     spt_OR = part.Split('/');
 
-
-                    if (pointer >= spt_MSG.Length) { match = false; }
-
-                    for (int i = pointer; i < spt_MSG.Length; i++)
+                    found = false;
+                    foreach (string tWord in spt_OR)
                     {
-                        found = false;
-                        foreach (string tWord in spt_OR)
+                        if (remaining_msg.ToLower().Trim().Contains(tWord.ToLower().Trim()))
                         {
-                            if (spt_MSG[i].ToLower().Trim() == tWord.ToLower().Trim())
+                            remaining_msg = RSplit(remaining_msg.ToLower().Trim(), tWord.ToLower().Trim());
+                            found = true;
+
+                            if (writeTilde)
                             {
-                                pointer = i + 1;
-                                found = true;
-                                writeTilde = false;
-                                break;
+                                tilde = LSplit(tilde.ToLower().Trim(), tWord.ToLower().Trim());
+                                tildeVals.Enqueue(tilde);
                             }
-                        }
-                        if (found) { match = true; break; }
 
-                        if (writeTilde)
-                        {
-                            tilde += spt_MSG[i] + " ";
-                            pointer = i + 1;
+                            writeTilde = false;
+                            break;
                         }
-                        else if (match)
-                        {
-                            match = false; break;
-                        }
-
-
                     }
+                    if (found) { match = true; }
 
-                    if (!match) { break; }
+                    if (!found && match) { match = false; break; }
 
                 }
 
+                
                 if (match)
                 {
-                    Console.WriteLine(word.translated.Replace("~", tilde.Trim()).Trim());
+                    //Unclosed tilde
+                    if (tilde != "")
+                    {
+                        tildeVals.Enqueue(tilde);
+                    }
+
+                    string cmd = word.translated.Trim();
+                    int index = 0;
+                    while (cmd.Contains('~'))
+                    {
+                        if (tildeVals.Count == 1)
+                        {
+                            cmd = cmd.Replace("~", tildeVals.Dequeue());
+                        }
+                        else
+                        {
+                            index = cmd.IndexOf('~');
+                            cmd = cmd.Remove(index, 1);
+                            cmd = cmd.Insert(index, tildeVals.Dequeue());
+                        }
+                    }
+
+                    Console.WriteLine(cmd);
+                    tildeVals.Clear();
 
                 }
             }
