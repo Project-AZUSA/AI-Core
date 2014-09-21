@@ -17,6 +17,11 @@ namespace AzusaTMS
             type = Type;
         }
 
+        public string GetType()
+        {
+            return type;
+        }
+
         public void Clear()
         {
             binder = null;
@@ -171,7 +176,7 @@ namespace AzusaTMS
                 content = Utils.ReplaceOnce(content, elem._type, elem._content);
             }
 
-            Concept item= new Concept(name, _prodType,content);
+            Concept item = new Concept(name, _prodType, content);
             item._fromFile = reactants[0]._fromFile;
             ConceptBase.Update(name + "," + _prodType + "," + content);
 
@@ -181,7 +186,7 @@ namespace AzusaTMS
         //React from a pool
         public List<Concept> React(Concept[] pool)
         {
-            List<Concept> lpool =pool.ToList();
+            List<Concept> lpool = pool.ToList();
             Concept[] match = null;
             int index;
 
@@ -203,7 +208,7 @@ namespace AzusaTMS
                         continue;
                     }
                 }
-                lpool.Insert(index,Apply(match));
+                lpool.Insert(index, Apply(match));
             } while (match != null);
 
             return lpool;
@@ -240,6 +245,11 @@ namespace AzusaTMS
                 }
             }
 
+            Rules.Sort(delegate(Rule x, Rule y)
+            {
+                return Math.Sign(y._reactType.Count() - x._reactType.Count());
+            });
+
         }
 
         static public List<Concept> Combine(Concept[] elements)
@@ -254,9 +264,35 @@ namespace AzusaTMS
                 {
                     pool = rule.React(pool.ToArray());
                 }
-            } while (!Utils.Identical(pool,old_pool));
+            } while (!Utils.Identical(pool, old_pool));
 
             return pool;
+        }
+
+        static public void SaveRules(string path)
+        {
+            Rules.Sort(delegate(Rule x, Rule y)
+            {
+                return Math.Sign(y._reactType.Count() - x._reactType.Count());
+            });
+
+
+            List<string> lines = new List<string>();
+            string line;
+            foreach (Rule item in Rules)
+            {
+                line = "";
+                foreach (Site site in item._reactType)
+                {
+                    line += site.GetType() + "+";
+                }
+                line = line.TrimEnd('+');
+                line += "," + item._prodType + "," + item._pattern;
+                lines.Add(line);
+            }
+
+            File.WriteAllLines(path, lines.ToArray(), Encoding.UTF8);
+
         }
 
         static public void Update(string line)
@@ -294,6 +330,11 @@ namespace AzusaTMS
                     Rules.Add(new Rule(sites.ToArray(), product.Trim(), pattern.Trim()));
                 }
             }
+
+            Rules.Sort(delegate(Rule x, Rule y)
+            {
+                return Math.Sign(y._reactType.Count() - x._reactType.Count());
+            });
 
         }
     }

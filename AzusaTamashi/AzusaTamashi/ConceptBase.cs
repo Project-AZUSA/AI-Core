@@ -52,16 +52,22 @@ namespace AzusaTMS
                 }
             }
 
-            DB.OrderByDescending(o => o._name.Length);
+            DB.Sort(delegate(Concept x, Concept y)
+            {
+                return Math.Sign(y._name.Length - x._name.Length);
+            });
         }
 
         static public void Save()
         {
+            DB.Sort(delegate(Concept x, Concept y)
+            {
+                return Math.Sign(y._name.Length - x._name.Length);
+            });
+
             foreach (string path in FileManager.GetPath())
             {
                 List<string> lines = new List<string>();
-
-                DB.OrderByDescending(o => o._name.Length);
 
                 foreach (Concept item in DB)
                 {
@@ -78,7 +84,7 @@ namespace AzusaTMS
         //Extract one concept from string
         static public Concept Extract(string from, out string Left, out string Right)
         {
-            
+
             foreach (Concept item in DB)
             {
                 if (from.Contains(item._name))
@@ -101,7 +107,7 @@ namespace AzusaTMS
 
             string Left, Right;
             Concept Current;
-            List<Concept> LList=new List<Concept>(), RList=new List<Concept>();
+            List<Concept> LList = new List<Concept>(), RList = new List<Concept>();
 
             Current = Extract(from, out Left, out Right);
             if (Left != "")
@@ -123,7 +129,7 @@ namespace AzusaTMS
             foreach (Concept item in RList)
             {
                 results.Add(item);
-            }            
+            }
 
             return results;
         }
@@ -151,9 +157,13 @@ namespace AzusaTMS
                 else
                 {
                     DB.Add(new Concept(itmName.Trim(), itmType.Trim(), itmContent.Trim()));
-                    DB.OrderByDescending(o => o._name.Length);
                 }
             }
+
+            DB.Sort(delegate(Concept x, Concept y)
+            {
+                return Math.Sign(y._name.Length - x._name.Length);
+            });
         }
     }
 }

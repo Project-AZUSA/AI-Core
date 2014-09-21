@@ -1,1 +1,2 @@
-﻿NUMBERS,IMPORT,data\numbers.txt
+﻿COMMANDS,IMPORT,data\commands.txt
+NUMBERS,IMPORT,data\numbers.txt

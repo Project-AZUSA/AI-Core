@@ -17,7 +17,7 @@ namespace AzusaTMS
             {
                 foreach (Concept node in ConceptBase.Parse(message))
                 {
-                    Console.WriteLine("IN: "+node._content + "," + node._type + "," + node._content);
+                    Console.WriteLine("IN: "+node._name + "," + node._type + "," + node._content);
                 }
 
                 products = Assembler.Combine(ConceptBase.Parse(message).ToArray());
@@ -25,7 +25,7 @@ namespace AzusaTMS
                 foreach (Concept node in products)
                 {
 
-                    Console.WriteLine(node._content + "," + node._type + "," + node._content);
+                    Console.WriteLine(node._name + "," + node._type + "," + node._content);
 
 
                     if (node._type == "MUTAN")
@@ -67,6 +67,9 @@ namespace AzusaTMS
                 inp = Console.ReadLine();
                 Process((new string[] { inp }).ToList(), true);
             }
+
+            ConceptBase.Save();
+            Assembler.SaveRules("rules.txt");
 
             ////TODO FIX SAVING
             //ZMQSub Azusa = new ZMQSub(Process, true);
