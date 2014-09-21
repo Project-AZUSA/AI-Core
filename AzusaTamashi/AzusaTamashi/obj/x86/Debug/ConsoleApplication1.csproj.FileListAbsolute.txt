@@ -1,0 +1,10 @@
+C:\Users\ytc\AppData\Local\Temporary Projects\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+C:\Users\ytc\AppData\Local\Temporary Projects\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+C:\Users\ytc\AppData\Local\Temporary Projects\ConsoleApplication1\bin\Debug\AzusaListener.dll
+C:\Users\ytc\AppData\Local\Temporary Projects\ConsoleApplication1\bin\Debug\clrzmq.dll
+C:\Users\ytc\AppData\Local\Temporary Projects\ConsoleApplication1\bin\Debug\AzusaListener.pdb
+C:\Users\ytc\AppData\Local\Temporary Projects\ConsoleApplication1\bin\Debug\clrzmq.pdb
+C:\Users\ytc\AppData\Local\Temporary Projects\ConsoleApplication1\bin\Debug\clrzmq.xml
+C:\Users\ytc\AppData\Local\Temporary Projects\ConsoleApplication1\obj\x86\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache
+C:\Users\ytc\AppData\Local\Temporary Projects\ConsoleApplication1\obj\x86\Debug\ConsoleApplication1.exe
+C:\Users\ytc\AppData\Local\Temporary Projects\ConsoleApplication1\obj\x86\Debug\ConsoleApplication1.pdb

@@ -119,6 +119,7 @@ namespace LinkTable
                 numLine++;
             }
 
+
             return true;
 
 
@@ -192,12 +193,12 @@ namespace LinkTable
                     {
                         if (remaining_msg.ToLower().Trim().Contains(tWord.ToLower().Trim()))
                         {
-                            remaining_msg = RSplit(remaining_msg.ToLower().Trim(), tWord.ToLower().Trim());
+                            remaining_msg = RSplit(remaining_msg.Trim(), tWord.Trim());
                             found = true;
 
                             if (writeTilde)
                             {
-                                tilde = LSplit(tilde.ToLower().Trim(), tWord.ToLower().Trim());
+                                tilde = LSplit(tilde.Trim(), tWord.Trim());
                                 tildeVals.Enqueue(tilde);
                             }
 
@@ -326,7 +327,7 @@ namespace LinkTable
         static void ListenToConsole()
         {
 
-
+            Console.WriteLine("LinkRID(EVENT,true)");
             Console.WriteLine("RegisterAs(AI)");
             Console.WriteLine("GetInputPorts()");
             InputPorts = Console.ReadLine().Split(',');

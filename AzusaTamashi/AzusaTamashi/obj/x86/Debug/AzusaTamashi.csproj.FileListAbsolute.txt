@@ -1,0 +1,11 @@
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\bin\Debug\AzusaTamashi.exe.config
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\bin\Debug\AzusaTamashi.exe
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\bin\Debug\AzusaTamashi.pdb
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\bin\Debug\AzusaListener.dll
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\bin\Debug\clrzmq.dll
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\bin\Debug\AzusaListener.pdb
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\bin\Debug\clrzmq.pdb
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\bin\Debug\clrzmq.xml
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\obj\x86\Debug\AzusaTamashi.exe
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\obj\x86\Debug\AzusaTamashi.pdb
+C:\Users\ytc\Documents\Program\AzusaTamashi\AzusaTamashi\obj\x86\Debug\AzusaTamashi.csprojResolveAssemblyReference.cache
