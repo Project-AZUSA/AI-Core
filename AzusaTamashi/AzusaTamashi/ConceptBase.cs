@@ -11,7 +11,7 @@ namespace AzusaTMS
         public string _name;
         public string _content;
         public string _type;
-        public string _fromFile;
+        public string _fromFile;        
 
         public Concept(string Name, string Type, string Content)
         {

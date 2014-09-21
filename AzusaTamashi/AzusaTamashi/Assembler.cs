@@ -17,7 +17,7 @@ namespace AzusaTMS
             type = Type;
         }
 
-        public string GetType()
+        public string Type()
         {
             return type;
         }
@@ -68,27 +68,42 @@ namespace AzusaTMS
 
 
         //Make combinations that matches the binding sites
-        public Concept[] GetMatch(Concept[] elements)
+        public Concept[] GetMatch(Concept[] elements, out int[] order, bool KeepOrder = true)
         {
             bool canBind;
             bool isAMatch;
-            List<Concept[]> results = new List<Concept[]>();
+            Concept[] result = null;
+            int[] resultID = null;
+            Concept[][] Combinations = null;
+            int[][] IDCombinations = null;
 
-            Concept[][] Combinations = Utils.FastPowerSet<Concept>(elements);
+            if (KeepOrder)
+            {
+                Combinations = Utils.AdjacentSets<Concept>(elements);
+                IDCombinations = Utils.AdjacentSetsID<Concept>(elements);
+            }
+            else
+            {
+                Combinations = Utils.FastPowerSet<Concept>(elements);
+            }
 
-            for (int i = 0; i < (1 << elements.Length); i++) //for each combination
+            for (int i = 0; i < Combinations.GetLength(0); i++) //for each combination
             {
                 isAMatch = true;
 
                 //try to bind every element
                 ClearSites();
 
+
+                if (Combinations[i].Length < _reactType.Length) { continue; }
+
+
                 foreach (Concept elem in Combinations[i])
                 {
                     canBind = false;
-                    foreach (Site site in _reactType)
+                    for (int index = 0; index < _reactType.Length; index++)
                     {
-                        if (site.Bind(elem))
+                        if (_reactType[index].Bind(elem))
                         {
                             canBind = true;
                             break;
@@ -108,63 +123,14 @@ namespace AzusaTMS
 
                 if (isAMatch)
                 {
-                    return Combinations[i];
+                    result = Combinations[i];
+                    if (KeepOrder) resultID = IDCombinations[i];
                 }
             }
-
-            return null;
+            order = resultID;
+            return result;
         }
 
-        //Make combinations that matches the binding sites
-        public List<Concept[]> Matches(Concept[] elements)
-        {
-            Concept[][] Combinations = Utils.FastPowerSet<Concept>(elements);
-
-            bool canBind;
-            bool isAMatch;
-            List<Concept[]> results = new List<Concept[]>();
-
-            //i < 2^N
-            for (int i = 0; i < (1 << elements.Length); i++) //for each combination
-            {
-                isAMatch = true;
-
-                //try to bind every element
-                ClearSites();
-
-                foreach (Concept elem in Combinations[i])
-                {
-                    canBind = false;
-                    foreach (Site site in _reactType)
-                    {
-                        if (site.Bind(elem))
-                        {
-                            canBind = true;
-                            break;
-                        }
-                    }
-                    if (!canBind) { isAMatch = false; break; }
-                }
-
-                foreach (Site site in _reactType)
-                {
-                    if (!site.occupied)
-                    {
-                        isAMatch = false;
-                        break;
-                    }
-                }
-
-                if (isAMatch)
-                {
-                    results.Add(Combinations[i]);
-                }
-            }
-
-            return results;
-        }
-
-        //Apply the rule 
         public Concept Apply(Concept[] reactants)
         {
             string content = _pattern;
@@ -178,34 +144,47 @@ namespace AzusaTMS
 
             Concept item = new Concept(name, _prodType, content);
             item._fromFile = reactants[0]._fromFile;
-            ConceptBase.Update(name + "," + _prodType + "," + content);
+            //ConceptBase.Update(name + "," + _prodType + "," + content);
 
             return item;
         }
 
         //React from a pool
-        public List<Concept> React(Concept[] pool)
+        public List<Concept> React(Concept[] pool, bool KeepOrder = true)
         {
             List<Concept> lpool = pool.ToList();
             Concept[] match = null;
-            int index;
+            int[] matchID = null;
+            int index, counter;
 
-            //foreach (Concept[] match in Matches(pool))
             do
             {
-                index = 0;
-                match = GetMatch(lpool.ToArray());
+                index = -1;
+                match = GetMatch(lpool.ToArray(), out matchID, KeepOrder);
                 if (match == null) break;
-                foreach (Concept reactant in match)
+                if (KeepOrder)
                 {
-                    if (lpool.Contains(reactant))
+                    counter = 0;
+                    foreach (int position in matchID)
                     {
-                        index = lpool.IndexOf(reactant);
-                        lpool.Remove(reactant);
+                        if (index == -1) index = position;
+                        lpool.RemoveAt(position-counter);
+                        counter++;
                     }
-                    else
+                }
+                else
+                {
+                    foreach (Concept reactant in match)
                     {
-                        continue;
+                        if (lpool.Contains(reactant))
+                        {
+                            if (index == -1) index = lpool.IndexOf(reactant);
+                            lpool.Remove(reactant);
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
                 }
                 lpool.Insert(index, Apply(match));
@@ -247,7 +226,7 @@ namespace AzusaTMS
 
             Rules.Sort(delegate(Rule x, Rule y)
             {
-                return Math.Sign(y._reactType.Count() - x._reactType.Count());
+                return Math.Sign(x._reactType.Count() - y._reactType.Count());
             });
 
         }
@@ -269,11 +248,50 @@ namespace AzusaTMS
             return pool;
         }
 
+        static public List<Concept> FreeCombine(Concept[] elements)
+        {
+            List<Concept> pool = elements.ToList<Concept>();
+            List<Concept> old_pool;
+
+            do
+            {
+                old_pool = pool;
+                foreach (Rule rule in Rules)
+                {
+                    pool = rule.React(pool.ToArray(), false);
+                }
+            } while (!Utils.Identical(pool, old_pool));
+
+            return pool;
+        }
+
+        static public List<Concept> StrictCombine(Concept[] elements)
+        {
+            List<Concept> pool = elements.ToList<Concept>();
+            List<Concept> old_pool;
+
+            do
+            {
+                old_pool = pool;
+
+                foreach (string rule in Utils.GetRuleSets(pool.ToArray()))
+                {
+                    Rule r = SearchRule(rule);
+                    if (r != null)
+                    {
+                        pool = r.React(pool.ToArray());
+                    }
+                }
+            } while (!Utils.Identical(pool, old_pool));
+
+            return pool;
+        }
+
         static public void SaveRules(string path)
         {
             Rules.Sort(delegate(Rule x, Rule y)
             {
-                return Math.Sign(y._reactType.Count() - x._reactType.Count());
+                return Math.Sign(x._reactType.Count() - y._reactType.Count());
             });
 
 
@@ -284,7 +302,7 @@ namespace AzusaTMS
                 line = "";
                 foreach (Site site in item._reactType)
                 {
-                    line += site.GetType() + "+";
+                    line += site.Type() + "+";
                 }
                 line = line.TrimEnd('+');
                 line += "," + item._prodType + "," + item._pattern;
@@ -295,7 +313,30 @@ namespace AzusaTMS
 
         }
 
-        static public void Update(string line)
+        static public Rule SearchRule(string reactants)
+        {
+            string type;
+
+            foreach (Rule r in Rules)
+            {
+
+                type = "";
+                foreach (Site site in r._reactType)
+                {
+                    type += site.Type() + "+";
+                }
+                type = type.TrimEnd('+');
+
+                if (type == reactants)
+                {
+                    return r;
+                }
+            }
+
+            return null;
+        }
+
+        static public void UpdateRule(string line)
         {
             string[] reactants;
             List<Site> sites = new List<Site>();
@@ -333,7 +374,7 @@ namespace AzusaTMS
 
             Rules.Sort(delegate(Rule x, Rule y)
             {
-                return Math.Sign(y._reactType.Count() - x._reactType.Count());
+                return Math.Sign(x._reactType.Count() - y._reactType.Count());
             });
 
         }

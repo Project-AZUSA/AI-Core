@@ -20,7 +20,9 @@ namespace AzusaTMS
                     Console.WriteLine("IN: "+node._name + "," + node._type + "," + node._content);
                 }
 
-                products = Assembler.Combine(ConceptBase.Parse(message).ToArray());
+                products = Assembler.StrictCombine(ConceptBase.Parse(message).ToArray());
+
+               
 
                 foreach (Concept node in products)
                 {
@@ -32,13 +34,13 @@ namespace AzusaTMS
                     {
                         Console.WriteLine(node._content);
                     }
-                    else if (node._type == "UPDATE")
+                    else if (node._type == "CONCEPT")
                     {
                         ConceptBase.Update(node._content);
                     }
                     else if (node._type == "RULE")
                     {
-                        Assembler.Update(node._content);
+                        Assembler.UpdateRule(node._content);
                     }
                 }
             }
@@ -48,7 +50,6 @@ namespace AzusaTMS
 
         static void Main(string[] args)
         {
-
             try
             {
                 ConceptBase.Load("data\\main.txt");
