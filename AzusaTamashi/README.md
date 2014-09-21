@@ -7,6 +7,7 @@
  - Name
  - Type
  - Content
+
 e.g.
 1,NUMBER,1
 
@@ -14,6 +15,7 @@ e.g.
  - Reactant
  - Product Type
  - Product Rule
+
 e.g.
 NUMBER+NUMBER,NUMBER,NUMBERNUMBER
 
