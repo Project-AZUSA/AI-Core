@@ -101,7 +101,7 @@ namespace AzusaTMS
             return new Concept(from.Trim(), "UNKNOWN", from.Trim());
         }
 
-        static public List<Concept> Parse(string from)
+        static public List<Concept> Parse(string from, bool dropUnknown=false)
         {
             List<Concept> results = new List<Concept>();
 
@@ -112,11 +112,11 @@ namespace AzusaTMS
             Current = Extract(from, out Left, out Right);
             if (Left != "")
             {
-                LList = Parse(Left);
+                LList = Parse(Left,dropUnknown);
             }
             if (Right != "")
             {
-                RList = Parse(Right);
+                RList = Parse(Right,dropUnknown);
             }
 
             foreach (Concept item in LList)
@@ -124,7 +124,10 @@ namespace AzusaTMS
                 results.Add(item);
             }
 
-            results.Add(Current);
+            if (Current._type != "UNKNOWN" || !dropUnknown)
+            {
+                results.Add(Current);
+            }
 
             foreach (Concept item in RList)
             {

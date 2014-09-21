@@ -66,21 +66,26 @@ namespace AzusaTMS
             }
         }
 
-
         //Make combinations that matches the binding sites
-        public Concept[] GetMatch(Concept[] elements, out int[] order, bool KeepOrder = true)
+        public List<Concept[]> Matches(Concept[] elements, out List<int[]> order, bool KeepOrder = true)
         {
             bool canBind;
-            bool isAMatch;
-            Concept[] result = null;
-            int[] resultID = null;
+            bool isAMatch;  
             Concept[][] Combinations = null;
             int[][] IDCombinations = null;
 
+            List<int[]> resultID = new List<int[]>();
+            List<Concept[]> results = new List<Concept[]>();
 
-            Combinations = Utils.AdjacentSets<Concept>(elements);
-            IDCombinations = Utils.AdjacentSetsID<Concept>(elements);
-
+            if (KeepOrder)
+            {
+                Combinations = Utils.AdjacentSets<Concept>(elements);
+                IDCombinations = Utils.AdjacentSetsID<Concept>(elements);
+            }
+            else
+            {
+                Combinations = Utils.FastPowerSet<Concept>(elements);
+            }
 
             for (int i = 0; i < Combinations.GetLength(0); i++) //for each combination
             {
@@ -100,17 +105,8 @@ namespace AzusaTMS
                     {
                         if (_reactType[index].Bind(elem))
                         {
-                            if (KeepOrder && index > 0)
-                            {
-                                if (!_reactType[index - 1].occupied)
-                                {
-                                    canBind = false;
-                                    break;
-                                }
-                            }
                             canBind = true;
                             break;
-
                         }
                     }
                     if (!canBind) { isAMatch = false; break; }
@@ -127,8 +123,73 @@ namespace AzusaTMS
 
                 if (isAMatch)
                 {
+                    results.Add(Combinations[i]);
+                    if (KeepOrder) resultID.Add(IDCombinations[i]);
+
+                }
+            }
+            order = resultID;
+            return results;
+        }
+
+        //Make combinations that matches the binding sites
+        public Concept[] GetMatch(Concept[] elements, out int[] order, bool KeepOrder = true)
+        {
+            bool canBind;
+            bool isAMatch;
+            Concept[] result = null;
+            int[] resultID = null;
+            Concept[][] Combinations = null;
+            int[][] IDCombinations = null;
+
+            if (KeepOrder)
+            {
+                Combinations = Utils.AdjacentSets<Concept>(elements);
+                IDCombinations = Utils.AdjacentSetsID<Concept>(elements);
+            }
+            else
+            {
+                Combinations = Utils.FastPowerSet<Concept>(elements);
+            }
+
+            for (int i = 0; i < Combinations.GetLength(0); i++) //for each combination
+            {
+                isAMatch = true;
+
+                //try to bind every element
+                ClearSites();
+
+
+                if (Combinations[i].Length < _reactType.Length) { continue; }
+
+
+                foreach (Concept elem in Combinations[i])
+                {
+                    canBind = false;
+                    for (int index = 0; index < _reactType.Length; index++)
+                    {
+                        if (_reactType[index].Bind(elem))
+                        {
+                            canBind = true;
+                            break;
+                        }
+                    }
+                    if (!canBind) { isAMatch = false; break; }
+                }
+
+                foreach (Site site in _reactType)
+                {
+                    if (!site.occupied)
+                    {
+                        isAMatch = false;
+                        break;
+                    }
+                }
+
+                if (isAMatch)
+                {                    
                     result = Combinations[i];
-                    resultID = IDCombinations[i];
+                    if (KeepOrder) resultID = IDCombinations[i];
 
                     order = resultID;
                     return result;
@@ -145,7 +206,7 @@ namespace AzusaTMS
 
             foreach (Concept elem in reactants)
             {
-                name += elem._name + ",";
+                name += elem._name+",";
                 content = Utils.ReplaceOnce(content, elem._type, elem._content);
             }
             name = name.Trim(',') + "]";
@@ -159,26 +220,52 @@ namespace AzusaTMS
         public List<Concept> React(Concept[] pool, bool KeepOrder = true)
         {
             List<Concept> lpool = pool.ToList();
-            Concept[] match = null;
+            List<List<Concept>> grandPool = new List<List<Concept>>();
+            
+            List<Concept[]> matches = null;
+            Concept[] match=null;
             int[] matchID = null;
+            List<int[]> matchesID = null;
             int index, counter;
+            List<Concept> min = pool.ToList();
 
-            do
+            matches = Matches(lpool.ToArray(), out matchesID, KeepOrder);
+
+            for (int i = 0; i < matches.Count(); i++)
             {
+                lpool = pool.ToList();
                 index = -1;
-                match = GetMatch(lpool.ToArray(), out matchID, KeepOrder);
-                if (match == null) break;
-
-                counter = 0;
-                foreach (int position in matchID)
+                match = matches[i];
+                matchID = matchesID[i];
+                if (KeepOrder)
                 {
-                    if (index == -1) index = position;
-                    lpool.RemoveAt(position - counter);
-                    counter++;
+                    counter = 0;
+                    foreach (int position in matchID)
+                    {
+                        if (index == -1) index = position;
+                        lpool.RemoveAt(position - counter);
+                        counter++;
+                    }
                 }
-
+                else
+                {
+                    foreach (Concept reactant in match)
+                    {
+                        if (lpool.Contains(reactant))
+                        {
+                            if (index == -1) index = lpool.IndexOf(reactant);
+                            lpool.Remove(reactant);
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
                 lpool.Insert(index, Apply(match));
-            } while (match != null);
+            }
+
+
 
             return lpool;
         }
@@ -221,7 +308,7 @@ namespace AzusaTMS
 
         }
 
-        static public List<Concept> Combine(Concept[] elements, bool KeepOrder=true)
+        static public List<Concept> Combine(Concept[] elements)
         {
             List<Concept> pool = elements.ToList<Concept>();
             List<Concept> old_pool;
@@ -231,13 +318,51 @@ namespace AzusaTMS
                 old_pool = pool;
                 foreach (Rule rule in Rules)
                 {
-                    pool = rule.React(pool.ToArray(),KeepOrder);
+                    pool = rule.React(pool.ToArray());
                 }
             } while (!Utils.Identical(pool, old_pool));
 
             return pool;
         }
 
+        static public List<Concept> FreeCombine(Concept[] elements)
+        {
+            List<Concept> pool = elements.ToList<Concept>();
+            List<Concept> old_pool;
+
+            do
+            {
+                old_pool = pool;
+                foreach (Rule rule in Rules)
+                {
+                    pool = rule.React(pool.ToArray(), false);
+                }
+            } while (!Utils.Identical(pool, old_pool));
+
+            return pool;
+        }
+
+        static public List<Concept> StrictCombine(Concept[] elements)
+        {
+            List<Concept> pool = elements.ToList<Concept>();
+            List<Concept> old_pool;
+
+            do
+            {
+                old_pool = pool;
+
+                foreach (string rule in Utils.GetRuleSets(pool.ToArray()))
+                {
+                    Rule r = SearchRule(rule);
+                    if (r != null)
+                    {
+                        pool = r.React(pool.ToArray());
+                    }
+                }
+            } while (!Utils.Identical(pool, old_pool));
+
+            return pool;
+        }
 
         static public void SaveRules(string path)
         {

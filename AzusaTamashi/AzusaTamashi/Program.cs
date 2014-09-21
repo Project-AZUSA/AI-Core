@@ -20,8 +20,11 @@ namespace AzusaTMS
                     Console.WriteLine("IN: "+node._name + "," + node._type + "," + node._content);
                 }
 
-                products = Assembler.StrictCombine(ConceptBase.Parse(message).ToArray());
-
+                products = Assembler.Combine(ConceptBase.Parse(message).ToArray(),false);
+                if (products.Count > 1)
+                {
+                    Inquiry.Inquire(products.ToArray());
+                }
                
 
                 foreach (Concept node in products)
@@ -72,7 +75,7 @@ namespace AzusaTMS
             ConceptBase.Save();
             Assembler.SaveRules("rules.txt");
 
-            ////TODO FIX SAVING
+            
             //ZMQSub Azusa = new ZMQSub(Process, true);
             //Azusa.Start();
 

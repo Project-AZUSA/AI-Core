@@ -1,2 +1,2 @@
-﻿COMMANDS,IMPORT,data\commands.txt
-NUMBERS,IMPORT,data\numbers.txt
+﻿指令,IMPORT,data\commands.txt
+數字,IMPORT,data\numbers.txt
