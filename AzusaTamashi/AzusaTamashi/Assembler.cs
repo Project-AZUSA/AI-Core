@@ -224,6 +224,7 @@ namespace AzusaTMS
 
             foreach (string line in rawList)
             {
+                sites.Clear();
                 if (line.Contains(','))
                 {
                     reactants = line.Split(',')[0].Split('+');

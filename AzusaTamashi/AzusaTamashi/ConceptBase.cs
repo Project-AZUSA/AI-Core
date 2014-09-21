@@ -78,7 +78,7 @@ namespace AzusaTMS
         //Extract one concept from string
         static public Concept Extract(string from, out string Left, out string Right)
         {
-
+            
             foreach (Concept item in DB)
             {
                 if (from.Contains(item._name))
@@ -92,7 +92,7 @@ namespace AzusaTMS
             //if nothing hits
             Left = "";
             Right = "";
-            return new Concept(from.Trim(), "Unknown", "");
+            return new Concept(from.Trim(), "UNKNOWN", from.Trim());
         }
 
         static public List<Concept> Parse(string from)
