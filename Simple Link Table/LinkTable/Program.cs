@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Threading;
-using ZeroMQ;
 
 namespace LinkTable
 {
@@ -12,7 +11,6 @@ namespace LinkTable
     {
 
         static List<Word> wordList;
-        static List<Word> wordListC;
 
         struct Word
         {
@@ -27,8 +25,7 @@ namespace LinkTable
             string[] rawList;
             string[] parsed;
             string cmd;
-            wordList = new List<Word>();
-            wordListC = new List<Word>();
+            wordList = new List<Word>();            
 
 
             string currentPath = Environment.CurrentDirectory;
@@ -97,16 +94,8 @@ namespace LinkTable
 
                             //tilde handling
                             word.pronounced = parsed[0].Replace("~", "+~+").Trim('+');
-                            if (word.pronounced.StartsWith("@"))
-                            {
-                                word.pronounced = word.pronounced.TrimStart('@');
-                                wordListC.Add(word);
-                            }
-                            else
-                            {
-                                wordList.Add(word);
-                            }
 
+                            wordList.Add(word);
                         }
                     }
                 }
@@ -125,27 +114,18 @@ namespace LinkTable
 
         }
 
-        //對消息進行處理
-        static void Process(List<string> messages)
-        {
-
-            foreach (string msg in messages)
-            {
-
-                LookUp(msg, wordList);
-            }
-        }
+        //對消息進行處理       
 
         static void ProcessC(string message)
         {
-            LookUp(message, wordListC);
+            LookUp(message, wordList);
         }
 
         static void LookUp(string msg, List<Word> dict)
         {
             string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
-            string[] spt_OR; 
-            string remaining_msg="";
+            string[] spt_OR;
+            string remaining_msg = "";
 
             string tilde = "";
             Queue<string> tildeVals = new Queue<string>();
@@ -156,7 +136,7 @@ namespace LinkTable
 
             foreach (Word word in dict)
             {
-                remaining_msg = msg.Trim();                
+                remaining_msg = msg.Trim();
                 tilde = "";
                 found = false;
                 match = false;
@@ -212,7 +192,7 @@ namespace LinkTable
 
                 }
 
-                
+
                 if (match)
                 {
                     //Unclosed tilde
@@ -247,15 +227,8 @@ namespace LinkTable
         //接下來是與 AZUSA 和其他引擎溝通的部分, 一般不用更改
         //============================================================
         static Thread AZUSAlistener;
-        static Thread ZMQ;
         static int AZUSAPid;
         static bool AZUSAAlive = true;
-
-        static string[] InputPorts = new string[] { };
-        static List<string> CurrentPorts = new List<string>();
-
-        static ZmqSocket client;
-        static List<string> messages = new List<string>();
 
 
 
@@ -267,71 +240,19 @@ namespace LinkTable
                 return;
             }
 
-            ZMQ = new Thread(new ThreadStart(ZMQListener));
-            ZMQ.Start();
 
             AZUSAlistener = new Thread(new ThreadStart(ListenToConsole));
             AZUSAlistener.Start();
-
-
-
         }
 
-        static void ZMQListener()
-        {
-            using (var ctx = ZmqContext.Create())
-            {
-                while (AZUSAAlive)
-                {
-                    client = ctx.CreateSocket(SocketType.SUB);
 
-                    while (InputPorts.Count() == 0)
-                    {
-                        Thread.Sleep(160);
-                    }
-
-                    foreach (string port in InputPorts)
-                    {
-                        if (port.Trim() != "")
-                        {
-                            Console.WriteLine("Connecting to " + port);
-                            client.Connect(port);
-                            Console.WriteLine("Connected to " + port);
-                        }
-                    }
-
-
-                    client.Subscribe(Encoding.UTF8.GetBytes(""));
-
-
-
-
-                    while (AZUSAAlive)
-                    {
-
-                        messages.Add(client.Receive(Encoding.UTF8));
-
-
-                        if (messages.Count != 0)
-                        {
-                            Process(messages);
-                        }
-
-                        messages.Clear();
-                    }
-                }
-
-            }
-        }
 
         static void ListenToConsole()
         {
 
             Console.WriteLine("LinkRID(EVENT,true)");
+            Console.WriteLine("LinkRID(INPUT,true)");
             Console.WriteLine("RegisterAs(AI)");
-            Console.WriteLine("GetInputPorts()");
-            InputPorts = Console.ReadLine().Split(',');
-
 
             Console.WriteLine("GetAzusaPid()");
             AZUSAPid = Convert.ToInt32(Console.ReadLine());
@@ -346,29 +267,8 @@ namespace LinkTable
                 {
                     System.Diagnostics.Process.GetProcessById(AZUSAPid);
                     msg = Console.ReadLine().Trim();
-                    if (msg == "PortHasChanged")
-                    {
+                    ProcessC(msg);
 
-
-                        Console.WriteLine("GetInputPorts()");
-                        InputPorts = Console.ReadLine().Split(',');
-
-                        foreach (string port in InputPorts)
-                        {
-                            if (port.Trim() != "" && !CurrentPorts.Contains(port))
-                            {
-                                Console.WriteLine("Connecting to " + port);
-                                client.Connect(port);
-                                CurrentPorts.Add(port);
-                                Console.WriteLine("Connected to " + port);
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        ProcessC(msg);
-                    }
                 }
                 catch
                 {

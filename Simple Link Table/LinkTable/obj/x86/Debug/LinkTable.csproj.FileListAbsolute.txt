@@ -1,9 +1,6 @@
-C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Debug\clrzmq.dll
 C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\obj\x86\Debug\LinkTable.csprojResolveAssemblyReference.cache
 C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Debug\AzusaLT.exe.config
 C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Debug\AzusaLT.exe
 C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Debug\AzusaLT.pdb
-C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Debug\clrzmq.pdb
-C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Debug\clrzmq.xml
 C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\obj\x86\Debug\AzusaLT.exe
 C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\obj\x86\Debug\AzusaLT.pdb
