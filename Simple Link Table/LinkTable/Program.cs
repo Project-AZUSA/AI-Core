@@ -10,7 +10,7 @@ namespace LinkTable
     partial class Program
     {
 
-        static List<Word> wordList;
+        static List<Word> dict;
 
         struct Word
         {
@@ -25,7 +25,7 @@ namespace LinkTable
             string[] rawList;
             string[] parsed;
             string cmd;
-            wordList = new List<Word>();            
+            dict = new List<Word>();            
 
 
             string currentPath = Environment.CurrentDirectory;
@@ -95,7 +95,7 @@ namespace LinkTable
                             //tilde handling
                             word.pronounced = parsed[0].Replace("~", "+~+").Trim('+');
 
-                            wordList.Add(word);
+                            dict.Add(word);
                         }
                     }
                 }
@@ -114,15 +114,11 @@ namespace LinkTable
 
         }
 
-        //對消息進行處理       
-
-        static void ProcessC(string message)
+       
+        static void Process(string msg)
         {
-            LookUp(message, wordList);
-        }
+            msg = System.Web.HttpUtility.UrlDecode(msg);
 
-        static void LookUp(string msg, List<Word> dict)
-        {
             string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
             string[] spt_OR;
             string remaining_msg = "";
@@ -224,8 +220,6 @@ namespace LinkTable
             }
         }
 
-        //接下來是與 AZUSA 和其他引擎溝通的部分, 一般不用更改
-        //============================================================
         static Thread AZUSAlistener;
         static int AZUSAPid;
         static bool AZUSAAlive = true;
@@ -267,7 +261,7 @@ namespace LinkTable
                 {
                     System.Diagnostics.Process.GetProcessById(AZUSAPid);
                     msg = Console.ReadLine().Trim();
-                    ProcessC(msg);
+                    Process(msg);
 
                 }
                 catch
