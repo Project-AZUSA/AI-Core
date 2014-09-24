@@ -20,7 +20,7 @@ namespace AzusaTMS
                     Console.WriteLine("IN: "+node._name + "," + node._type + "," + node._content);
                 }
 
-                products = Assembler.Combine(ConceptBase.Parse(message).ToArray(),false);
+                products = Assembler.Combine(ConceptBase.Parse(message).ToArray());
                 if (products.Count > 1)
                 {
                     Inquiry.Inquire(products.ToArray());

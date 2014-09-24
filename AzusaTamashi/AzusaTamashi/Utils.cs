@@ -79,7 +79,7 @@ namespace AzusaTMS
             return false;
         }
 
-        public static string[] GetRuleSets(Concept[] pool)
+        public static string[] GetRuleCombinations(Concept[] pool)
         {
             string type="";
             foreach (Concept c in pool)
@@ -109,7 +109,10 @@ namespace AzusaTMS
                         line += reactants[i] + "+";
                     }
                     line=line.Trim('+');
-                    results.Add(line);
+                    if (!results.Contains(line))
+                    {
+                        results.Add(line);
+                    }
                 }
             }
             return results.ToArray();

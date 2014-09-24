@@ -21,6 +21,7 @@ namespace AzusaTMS
             if (UnknownConcepts.Count > 0)
             {
                 //Clarify concepts
+                Console.WriteLine("");
             }
             else
             {
