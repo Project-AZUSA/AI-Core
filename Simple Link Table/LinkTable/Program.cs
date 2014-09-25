@@ -117,8 +117,9 @@ namespace LinkTable
        
         static void Process(string msg)
         {
-            msg = System.Web.HttpUtility.UrlDecode(msg);
-
+            if(msg.StartsWith("EVENT(")){
+                msg = msg.Remove(msg.Length - 1).Replace("EVENT(", "@");
+            }
 
             string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
             string[] spt_OR;
@@ -249,8 +250,16 @@ namespace LinkTable
             Console.WriteLine("LinkRID(INPUT,true)");
             Console.WriteLine("RegisterAs(AI)");
 
-            Console.WriteLine("GetAzusaPid()");
-            AZUSAPid = Convert.ToInt32(Console.ReadLine());
+            for (int i = 0; i < 5; i++)
+            {
+                try
+                {
+                    Console.WriteLine("GetAzusaPid()");
+                    AZUSAPid = Convert.ToInt32(Console.ReadLine());
+                    break;
+                }
+                catch { }
+            }
 
             string msg;
 
@@ -260,10 +269,7 @@ namespace LinkTable
             {
                 try
                 {
-                    System.Diagnostics.Process.GetProcessById(AZUSAPid);
-                    msg = Console.ReadLine().Trim();
-                    Process(msg);
-
+                    System.Diagnostics.Process.GetProcessById(AZUSAPid);     
                 }
                 catch
                 {
@@ -271,6 +277,9 @@ namespace LinkTable
                     Environment.Exit(0);
                     break;
                 }
+
+                msg = Console.ReadLine().Trim();
+                Process(msg);
             }
         }
     }
