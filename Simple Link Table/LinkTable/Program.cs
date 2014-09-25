@@ -119,6 +119,7 @@ namespace LinkTable
         {
             msg = System.Web.HttpUtility.UrlDecode(msg);
 
+
             string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
             string[] spt_OR;
             string remaining_msg = "";
@@ -244,7 +245,7 @@ namespace LinkTable
         static void ListenToConsole()
         {
 
-            Console.WriteLine("LinkRID(EVENT,true)");
+            Console.WriteLine("LinkRID(EVENT,false)");
             Console.WriteLine("LinkRID(INPUT,true)");
             Console.WriteLine("RegisterAs(AI)");
 

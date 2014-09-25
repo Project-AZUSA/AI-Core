@@ -2,53 +2,53 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Azusa;
+using System.Threading;
 
 namespace AzusaTMS
 {
     class Program
     {
-
-
-        static ZMQSub.DProcess Process = (List<string> msg, bool console) =>
+        static int AZUSAPid = -1;
+        static void AZUSALock()
         {
-            List<Concept> products;
-            foreach (string message in msg)
+            try
             {
-                foreach (Concept node in ConceptBase.Parse(message))
-                {
-                    Console.WriteLine("IN: "+node._name + "," + node._type + "," + node._content);
-                }
-
-                products = Assembler.Combine(ConceptBase.Parse(message).ToArray());
-                if (products.Count > 1)
-                {
-                    Inquiry.Inquire(products.ToArray());
-                }
-               
-
-                foreach (Concept node in products)
-                {
-
-                    Console.WriteLine(node._name + "," + node._type + "," + node._content);
-
-
-                    if (node._type == "MUTAN")
-                    {
-                        Console.WriteLine(node._content);
-                    }
-                    else if (node._type == "CONCEPT")
-                    {
-                        ConceptBase.Update(node._content);
-                    }
-                    else if (node._type == "RULE")
-                    {
-                        Assembler.UpdateRule(node._content);
-                    }
-                }
+                System.Diagnostics.Process.GetProcessById(AZUSAPid);
             }
+            catch
+            {
+                ConceptBase.Save();
+                Assembler.SaveRules("rules.txt");
 
-        };
+                Environment.Exit(0);
+            }
+        }
+
+        static void Process(string msg, bool console)
+        {
+
+            Concept product = Parser.Parse(ConceptBase.Parse(msg).ToArray());
+
+            Console.WriteLine(product._name + ", " + product._type + ", "+ product._content);
+
+            //if (product._type == "MUTAN")
+            //{
+            //    Console.WriteLine(product._content);
+            //}
+            //else if (product._type == "NEWCONCEPT")
+            //{
+            //    ConceptBase.Update(product._content);
+            //}
+            //else if (product._type == "NEWRULE")
+            //{
+            //    Assembler.UpdateRule(product._content);
+            //}
+            //else if (product._type != "UNKNOWN")
+            //{
+            //    Console.WriteLine("AI(\"" + product._name + "\")");
+            //}
+
+        }
 
 
         static void Main(string[] args)
@@ -64,22 +64,30 @@ namespace AzusaTMS
                 Environment.Exit(0);
             }
 
+#if !DEBUG
 
-            string inp = "";
-            while (inp != "EXIT")
+            for (int i = 0; i < 3; i++)
             {
-                inp = Console.ReadLine();
-                Process((new string[] { inp }).ToList(), true);
+                Console.WriteLine("GetAzusaPid()");
+                try
+                {
+                    AZUSAPid = Convert.ToInt32(Console.ReadLine());
+                    break;
+                }
+                catch { }
             }
 
-            ConceptBase.Save();
-            Assembler.SaveRules("rules.txt");
+            new Thread(new ThreadStart(AZUSALock)).Start();
 
-            
-            //ZMQSub Azusa = new ZMQSub(Process, true);
-            //Azusa.Start();
-
-
+            Console.WriteLine("RegisterAs(AI)");
+            Console.WriteLine("LinkRID(INPUT,true)");
+#endif
+            string inp = "";
+            while (true)
+            {
+                inp = Console.ReadLine();
+                Process(inp, true);
+            }
 
         }
     }

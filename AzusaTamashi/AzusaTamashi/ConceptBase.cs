@@ -137,7 +137,7 @@ namespace AzusaTMS
             return results;
         }
 
-        static public void Update(string line)
+        static public void Update(string line, string fromfile="data\\main.txt")
         {
             string itmName, itmType, itmContent;
             if (line.Contains(','))
@@ -159,7 +159,9 @@ namespace AzusaTMS
                 }
                 else
                 {
-                    DB.Add(new Concept(itmName.Trim(), itmType.Trim(), itmContent.Trim()));
+                    Concept c = new Concept(itmName.Trim(), itmType.Trim(), itmContent.Trim());
+                    c._fromFile = fromfile;
+                    DB.Add(c);
                 }
             }
 

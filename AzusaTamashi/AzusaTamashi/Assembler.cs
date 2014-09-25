@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.IO;
 
 namespace AzusaTMS
@@ -20,7 +21,15 @@ namespace AzusaTMS
             _pattern = pattern;
         }
 
-      
+        public string GetTypeStr()
+        {
+            string type = "";
+            foreach (string site in _reactType)
+            {
+                type += site + "+";
+            }
+            return type.TrimEnd('+');
+        }
 
         //Apply to rule onto a pool of reactants
         public Concept GetProduct(Concept[] reactants)
@@ -44,36 +53,35 @@ namespace AzusaTMS
         {
             var product = reactants.ToList();
 
-            bool hit = false;
             bool match = false;
             int index = -1;
-            int current_site = 0;
 
-            for (int pos = 0; pos < reactants.Length; pos++)
+            for (int begin = 0; begin < reactants.Length; begin++)
             {
-                if (reactants[pos]._type == _reactType[current_site])
+                for (int site = 0; site < _reactType.Length; site++)
                 {
-                    hit = true;
-                    if (current_site == _reactType.Length - 1)
+                    if (reactants[begin + site]._type != _reactType[site])
                     {
-                        match = true;
-                        index = pos - (_reactType.Length - 1);
                         break;
                     }
-                    current_site++;
+                    else if (site == _reactType.Length - 1)
+                    {
+                        match = true;
+                        index = begin;
+                        break;
+                    }
                 }
-                else
-                {
-                    hit = false;
-                    current_site = 0;
-                }
+                if (match) break;
             }
 
-            product.Insert(index,GetProduct(product.GetRange(index, _reactType.Length).ToArray()));
-            product.RemoveRange(index + 1, _reactType.Length);
-
+               
+            
+            if (match)
+            {
+                product.Insert(index, GetProduct(product.GetRange(index, _reactType.Length).ToArray()));
+                product.RemoveRange(index + 1, _reactType.Length);
+            }
             return product.ToArray();
-
         }
     }
 
@@ -83,7 +91,7 @@ namespace AzusaTMS
         static List<Rule> Rules = new List<Rule>();
 
         
-        static public List<Concept> Combine(Concept[] elements)
+        static public List<Concept[]> Combine(Concept[] elements)
         {
             List<Concept[]> current_level = new List<Concept[]>();
             current_level.Add(elements);
@@ -121,7 +129,7 @@ namespace AzusaTMS
                 return Math.Sign(x.Length - y.Length);
             });
 
-            return current_level[0].ToList();
+            return current_level.ToList();
         }
 
         static List<Rule> GetApplicableRules(Concept[] elements)
@@ -183,20 +191,18 @@ namespace AzusaTMS
 
         static public Rule SearchForRule(string reactants)
         {
-            string type;
+            int numsites=reactants.Split('+').Count();
+
+            Regex regex = new Regex(reactants.Replace("+","\\+"));
 
             foreach (Rule r in Rules)
             {
-                type = "";
-                foreach (string site in r._reactType)
-                {
-                    type += site + "+";
-                }
-                type = type.TrimEnd('+');
-
-                if (type == reactants)
-                {
-                    return r;
+                if (r._reactType.Count() == numsites)
+                {    
+                    if (regex.IsMatch(r.GetTypeStr()))
+                    {
+                        return r;
+                    }
                 }
             }
 
