@@ -117,8 +117,10 @@ namespace LinkTable
        
         static void Process(string msg)
         {
+            bool EVENT = false;
             if(msg.StartsWith("EVENT(")){
                 msg = msg.Remove(msg.Length - 1).Replace("EVENT(", "@");
+                EVENT = true;
             }
 
             string[] spt_AND; //AND is splited first, OR-first spliting is not necessary due to multi-triggering
@@ -134,6 +136,11 @@ namespace LinkTable
 
             foreach (Word word in dict)
             {
+                if (EVENT && !word.pronounced.StartsWith("@"))
+                {
+                    continue;
+                }
+
                 remaining_msg = msg.Trim();
                 tilde = "";
                 found = false;
@@ -164,7 +171,7 @@ namespace LinkTable
                         continue;
                     }
 
-                    spt_OR = part.Split('/');
+                    spt_OR = part.Split('|');
 
                     found = false;
                     foreach (string tWord in spt_OR)
@@ -207,7 +214,7 @@ namespace LinkTable
                         {
                             cmd = cmd.Replace("~", tildeVals.Dequeue());
                         }
-                        else
+                        else if (tildeVals.Count>1)                         
                         {
                             index = cmd.IndexOf('~');
                             cmd = cmd.Remove(index, 1);
@@ -215,7 +222,7 @@ namespace LinkTable
                         }
                     }
 
-                    Console.WriteLine(cmd);
+                    Console.WriteLine(System.Web.HttpUtility.UrlEncode(cmd));
                     tildeVals.Clear();
 
                 }
@@ -279,7 +286,7 @@ namespace LinkTable
                 }
 
                 msg = Console.ReadLine().Trim();
-                Process(msg);
+                Process(System.Web.HttpUtility.UrlDecode(msg));
             }
         }
     }

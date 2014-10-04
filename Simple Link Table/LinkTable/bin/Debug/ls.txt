@@ -1,18 +1,12 @@
 ﻿hide, KILL(AzusaL2D)
 show, KILL(AzusaL2D);EXEC({AZUSA}\Engines\AzusaL2D.exe)
-
-bili, EXEC(chrome+"$http://bilibili.com/")
-see something cool, SAY(いいよ)
-
-helper, EXEC({AZUSA}\AzuHelp\AzuHelp.exe)
-ls, EXEC({AZUSA}\Engines\ls.txt)
-set~, ~=PRCPath;MSG(~)
-run~, ~!="~"?EXEC(~)
-顯~示, MSG(~)
-#~, ~
-#~,SCRIPT(~)
-
+test,MSG(test~)
 #時間日期
 time, SAY(今は+{tt}+{%h}+時+{%m}+分です)
 date, SAY(今日は+{%M}+月+{%d}+日+{dddd}+です)
+
+#版本更新提示
+@[WEB_UPDATE]http://azusa-cc.jit.su/version,　{http://azusa-cc.jit.su/version}!=SYS_VER?MSG("AZUSA 已更新至"+{http://azusa-cc.jit.su/version}+"版。雙擊圖標打開網頁。");$UPDATEMSG=TRUE
+@IconClicked, $UPDATEMSG=TRUE?EXEC("http://azusa.ftp.cc/")
+
 

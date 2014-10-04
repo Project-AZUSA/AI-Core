@@ -1,0 +1,6 @@
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Release\AzusaLT.exe.config
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Release\AzusaLT.exe
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\bin\Release\AzusaLT.pdb
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\obj\x86\Release\LinkTable.csprojResolveAssemblyReference.cache
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\obj\x86\Release\AzusaLT.exe
+C:\Users\ytc\Documents\GitHub\AI-Core\Simple Link Table\LinkTable\obj\x86\Release\AzusaLT.pdb
