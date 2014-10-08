@@ -1,6 +1,9 @@
 ﻿Tamashi
 =======
 
+** 重寫中, 第二個原型在 uchuutamashi\Nekomimi
+
+
 概念庫引擎原型
 
 概念 (Concept)
